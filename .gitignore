@@ -1,0 +1,43 @@
+# C++ compiled files
+*.o
+*.so
+*.dll
+
+# ignore temporary files
+code/rmarkdown/supporting-information_files
+code/rmarkdown/supporting-information.tex
+code/rmarkdown/slides_files
+code/rmarkdown/slides.tex
+code/rmarkdown/article.log
+code/rmarkdown/article_files/figure-latex*
+code/rmarkdown/figure_files/figure-latex*
+
+# ignore large data files
+data/raw/species/*.zip
+data/raw/gadm/*.gpkg
+data/raw/human-footprint-index-2013/*.tif
+data/raw/capad-terrestrial-2024/*.zip
+
+# R profile files
+*.Rproj.user
+*.Rhistory
+
+# log files
+gurobi.log
+
+# system files
+.directory
+
+# cache
+data/intermediate/*
+data/final/results.rda
+code/rmarkdown/figures_files/*
+code/rmarkdown/supporting_information_files/*
+
+# packrat library files
+packrat/lib
+packrat/lib-R
+
+# do not ignore the following files
+!*.gitkeep
+packrat/lib*/
