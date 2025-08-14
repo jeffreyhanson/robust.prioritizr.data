@@ -52,6 +52,21 @@ data/intermediate/00-*.rda: code/R/analysis/00-*.R code/parameters/general.toml 
 	$(R) CMD BATCH --no-restore --no-save '--args MODE=$(MODE)' code/R/analysis/00-*.R
 	mv -f *.Rout data/intermediate/
 
+# commands to fetch external data
+raw_data: data/raw/human-footprint-index-2013/hfp2013_merisINT.tif data/raw/gadm/gadm41_AUS.gpkg data/raw/capad-terrestrial-2024/Collaborative_Australian_Protected_Areas_Database_(CAPAD)_2024_-_Terrestrial__.zip data/raw/species/archibald-vert-data.zip
+
+data/raw/human-footprint-index-2013/hfp2013_merisINT.tif:
+	$(R) -e "piggyback::pb_download('hfp2013_merisINT.tif',repo='jeffreyhanson/robust.prioritizr.data',dest='data/raw/human-footprint-index-2013',tag='v0.0.1')"
+
+data/raw/gadm/gadm41_AUS.gpkg:
+	$(R) -e "piggyback::pb_download('gadm41_AUS.gpkg',repo='jeffreyhanson/robust.prioritizr.data',dest='data/raw/gadm',tag='v0.0.1')"
+
+data/raw/capad-terrestrial-2024/Collaborative_Australian_Protected_Areas_Database_(CAPAD)_2024_-_Terrestrial__.zip:
+	$(R) -e "piggyback::pb_download('Collaborative_Australian_Protected_Areas_Database_(CAPAD)_2024_-_Terrestrial__.zip',repo='jeffreyhanson/robust.prioritizr.data',dest='ata/raw/capad-terrestrial-2024/data',tag='v0.0.1')"
+
+data/raw/species/archibald-vert-data.zip:
+	$(R) -e "piggyback::pb_download('archibald-vert-data.zip',repo='jeffreyhanson/robust.prioritizr.data',dest='data/raw/species',tag='v0.0.1')"
+
 # command to install dependencies
 install:
 	$(R) CMD BATCH --no-restore --no-save code/R/scripts/init.R
