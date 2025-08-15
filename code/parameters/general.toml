@@ -1,1 +1,7 @@
- 
+title = "general parameters"
+
+[debug]
+crs = 3577
+
+[release]
+crs = 3577

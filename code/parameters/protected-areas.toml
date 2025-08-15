@@ -1,1 +1,7 @@
- 
+title = "protected area parameters"
+
+[debug]
+threshold = 0.5
+
+[release]
+threshold = 0.5

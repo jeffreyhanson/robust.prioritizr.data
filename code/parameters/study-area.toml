@@ -1,0 +1,7 @@
+title = "study area parameters"
+
+[debug]
+name = "Victoria"
+
+[release]
+name = "Victoria"

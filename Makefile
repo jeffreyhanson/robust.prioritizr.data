@@ -36,7 +36,7 @@ data/intermediate/04-*.rda: data/intermediate/03-*.rda code/R/analysis/04-*.R  c
 	$(R) CMD BATCH --no-restore --no-save code/R/analysis/04-*.R
 	mv -f *.Rout data/intermediate/
 
-data/intermediate/03-*.rda: data/intermediate/02-*.rda code/R/analysis/03-*.R
+data/intermediate/03-*.rda: data/intermediate/02-*.rda code/R/analysis/03-*.R code/R/functions/spatial_interpolation.R
 	$(R) CMD BATCH --no-restore --no-save code/R/analysis/03-*.R
 	mv -f *.Rout data/intermediate/
 
@@ -62,10 +62,10 @@ data/raw/gadm/gadm41_AUS.gpkg:
 	$(R) -e "piggyback::pb_download('gadm41_AUS.gpkg',repo='jeffreyhanson/robust.prioritizr.data',dest='data/raw/gadm',tag='v0.0.1')"
 
 data/raw/capad-terrestrial-2024/Collaborative_Australian_Protected_Areas_Database_(CAPAD)_2024_-_Terrestrial__.zip:
-	$(R) -e "piggyback::pb_download('Collaborative_Australian_Protected_Areas_Database_(CAPAD)_2024_-_Terrestrial__.zip',repo='jeffreyhanson/robust.prioritizr.data',dest='ata/raw/capad-terrestrial-2024/data',tag='v0.0.1')"
+	$(R) -e "piggyback::pb_download('Collaborative_Australian_Protected_Areas_Database_(CAPAD)_2024_-_Terrestrial__.zip',repo='jeffreyhanson/robust.prioritizr.data',dest='data/raw/capad-terrestrial-2024/data',tag='v0.0.1')"
 
 data/raw/species/archibald-vert-data.zip:
-	$(R) -e "piggyback::pb_download('archibald-vert-data.zip',repo='jeffreyhanson/robust.prioritizr.data',dest='data/raw/species',tag='v0.0.1')"
+	$(R) -e "source('code/R/scripts/fetch_zip.R');fetch_zip('archibald-vert-data.zip',repo='jeffreyhanson/robust.prioritizr.data',dest='data/raw/species',tag='v0.0.1')"
 
 # command to install dependencies
 install:
