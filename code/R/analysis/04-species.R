@@ -55,11 +55,18 @@ model_perf_data <-
     ## load data
     maxent_data <- readr::read_csv(maxent_path, show_col_types = FALSE)
     boyce_data <- readr::read_csv(boyce_path, show_col_types = FALSE)
+    ## sanity check
+    assertthat::assert_that(
+      assertthat::has_name(maxent_data, spp_parameters$method_threshold),
+      is.numeric(maxent_data[[spp_parameters$method_threshold]]),
+      assertthat::noNA(maxent_data[[spp_parameters$method_threshold]])
+    )
     ## return data
     tibble::tibble(
       species = spp_names[[i]],
       auc = maxent_data[["Training AUC"]],
-      boyce = boyce_data[["Spearman.cor (the Boyce index value)"]]
+      boyce = boyce_data[["Spearman.cor (the Boyce index value)"]],
+      threshold = maxent_data[[spp_parameters$method_threshold]]
     )
   }) %>%
   dplyr::bind_rows()
@@ -85,20 +92,33 @@ meta_data <-
     )
   ) %>%
   left_join(model_perf_data, by = "species") %>%
-  select(id, species, class, model, auc, boyce, path)
+  select(id, species, class, model, auc, boyce, threshold, path)
 
-# sanity check
-assertthat::assert_that(
-  all(file.exists(meta_data$path))
-)
+# clean up
+rm(class_names, spp_names, model_names, model_perf_data)
+
+# subset species data based on taxa
+if (!identical(spp_parameters$class_name, "all")) {
+  meta_data <-
+    meta_data %>%
+    filter(class %in% spp_parameters$class_name) %>%
+    mutate(id = seq_along(species))
+}
 
 # subset species data based on models with adequate performance
 meta_data <-
   meta_data %>%
   filter(
-    auc >= spp_parameters$auc,
-    boyce >= spp_parameters$boyce
-  )
+    auc >= spp_parameters$auc_threshold,
+    boyce >= spp_parameters$boyce_threshold
+  ) %>%
+  mutate(id = seq_along(species))
+
+# sanity check
+assertthat::assert_that(
+  nrow(meta_data) >= 1,
+  all(file.exists(meta_data$path))
+)
 
 # resample species data to study area
 study_area_bbox <-
@@ -106,7 +126,8 @@ study_area_bbox <-
 spp_data <-
   lapply(seq_along(meta_data$path), function(i) {
     message("starting ", i, " / ", nrow(meta_data))
-    # note that 1st layer has mean, and 2nd is sd
+    # spatially prepare data
+    ## note that 1st layer has mean, and 2nd is sd
     curr_r <- terra::rast(meta_data$path[[i]])[[1]]
     curr_bbox <-
       study_area_bbox %>%
@@ -117,6 +138,9 @@ spp_data <-
       curr_r %>%
       terra::crop(curr_bbox, snap = "out") %>%
       terra::project(study_area_data, method = "bilinear")
+    ## threshold data
+    curr_r <- terra::as.int(curr_r >= meta_data$threshold[[i]])
+    ## return data
     curr_r
   }) %>%
   terra::rast() %>%
@@ -145,17 +169,27 @@ meta_data <-
 ## any layers that meet the threshold
 meta_data <-
   meta_data %>%
-  filter(spp_max_value >= spp_parameters$threshold)
+  filter(spp_max_value >= spp_parameters$min_area_threshold)
+
+# subset raster data
 spp_data <- spp_data[[meta_data$id]]
 
-# convert raster values to percentages
-spp_data <- spp_data / 100
+# update metadata
+meta_data <-
+  meta_data %>%
+  mutate(
+    id = seq_along(id),
+    name =  names(spp_data)
+  ) %>%
+  rename(proj = model) %>%
+  select(id, name, species, class, proj, auc, boyce, threshold)
 
 # save results
 spp_path <- "data/intermediate/species.tif"
 terra::writeRaster(
   spp_data, spp_path,
-  NAflag = -9999, overwrite = TRUE, datatype = "FLT4S"
+  NAflag = 2, overwrite = TRUE, datatype = "INT1U",
+  gdal = c("COMPRESS=ZSTD", "NBITS=2", "TILED=YES", "ZSTD_LEVEL=9")
 )
 
 # clean up

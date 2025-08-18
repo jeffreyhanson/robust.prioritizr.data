@@ -17,6 +17,12 @@ clean:
 	@touch data/final/.gitkeep
 	@touch article/.gitkeep
 
+upload:
+	$(R) -e "piggyback::pb_upload('article/cost.tif',repo='jeffreyhanson/robust.prioritizr.data',tag='v1.0.0'),overwrite=TRUE"
+	$(R) -e "piggyback::pb_upload('article/pa.tif',repo='jeffreyhanson/robust.prioritizr.data',tag='v1.0.0'),overwrite=TRUE"
+	$(R) -e "piggyback::pb_upload('article/species.tif',repo='jeffreyhanson/robust.prioritizr.data',tag='v1.0.0'),overwite=TRUE"
+	$(R) -e "piggyback::pb_upload('article/species.csv',repo='jeffreyhanson/robust.prioritizr.data',tag='v1.0.0'),overwite=TRUE"
+
 # commands for updating time-stamps
 touch:
 	touch data/intermediate/00*.rda

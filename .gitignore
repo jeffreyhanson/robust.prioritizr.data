@@ -17,6 +17,8 @@ data/raw/species/*.zip
 data/raw/gadm/*.gpkg
 data/raw/human-footprint-index-2013/*.tif
 data/raw/capad-terrestrial-2024/*.zip
+article/*.csv
+article/*.tif
 
 # R profile files
 *.Rproj.user

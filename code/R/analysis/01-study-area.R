@@ -52,7 +52,8 @@ study_area_data <-
 study_area_path <- "data/intermediate/study_area.tif"
 terra::writeRaster(
   study_area_data, study_area_path,
-  NAflag = -9999, overwrite = TRUE
+  NAflag = 2, overwrite = TRUE, datatype = "INT2U",
+  gdal = c("COMPRESS=ZSTD", "NBITS=2", "TILED=YES", "ZSTD_LEVEL=9")
 )
 
 # clean up

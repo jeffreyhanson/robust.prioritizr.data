@@ -34,7 +34,8 @@ assertthat::assert_that(
 cost_path <- "data/intermediate/cost.tif"
 terra::writeRaster(
   cost_data, cost_path,
-  NAflag = -9999, overwrite = TRUE
+  NAflag = -9999, overwrite = TRUE, datatype = "FLT4S",
+  gdal = c("COMPRESS=ZSTD", "TILED=YES", "ZSTD_LEVEL=9")
 )
 
 # clean up

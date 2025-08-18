@@ -2,7 +2,7 @@
 
 ## Overview
 
-The Collaborative Australian Protected Areas Database (CAPAD) is a spatial and textual database that provides information on Australia’s protected areas at national, state and territory levels. Published every 2 years, CAPAD provides a national perspective of the conservation of biodiversity in protected areas.
+The Collaborative Australian Protected Areas Database (CAPAD) is a spatial and textual database that provides information on Australia's protected areas at national, state and territory levels. Published every 2 years, CAPAD provides a national perspective of the conservation of biodiversity in protected areas.
 
 CAPAD includes information on all protected areas, including IUCN category, location (latitude and longitude of midpoint (centroid), area (hectares) and gazettal date for declaring a protected area.
 
