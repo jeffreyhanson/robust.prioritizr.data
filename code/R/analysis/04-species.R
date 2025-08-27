@@ -29,7 +29,7 @@ spp_names =
   strsplit("_historic_", fixed = TRUE) %>%
   lapply(`[[`, 1) %>%
   unlist()
-model_names <-
+proj_names <-
   tiff_files %>%
   basename() %>%
   gsub(pattern = "_AUS_5km_EnviroSuit.tif", replacement = "", fixed = TRUE) %>%
@@ -73,7 +73,7 @@ model_perf_data <-
 
 # prepare metadata
 meta_data <-
-  expand.grid(species = spp_names, model = model_names) %>%
+  expand.grid(species = spp_names, proj = proj_names) %>%
   tibble::as_tibble() %>%
   dplyr::left_join(
     tibble::tibble(
@@ -83,19 +83,23 @@ meta_data <-
     by = "species"
   ) %>%
   mutate(
-    id = seq_along(species)
+    name = paste0(
+      class, "-",  species, "-",
+      gsub("-", "_",  proj, fixed = TRUE)
+    )
   ) %>%
   mutate(
     path = paste0(
-      temp_dir, "/", class, "/", species, "_", model,
+      temp_dir, "/", class, "/", species, "_", proj,
       "_AUS_5km_EnviroSuit.tif"
     )
   ) %>%
   left_join(model_perf_data, by = "species") %>%
-  select(id, species, class, model, auc, boyce, threshold, path)
+  select(name, species, class, proj, auc, boyce, threshold, path) %>%
+  arrange(class, species, proj, name)
 
 # clean up
-rm(class_names, spp_names, model_names, model_perf_data)
+rm(class_names, spp_names, proj_names, model_perf_data)
 
 # subset species data based on taxa
 if (!identical(spp_parameters$class_name, "all")) {
@@ -144,12 +148,7 @@ spp_data <-
     curr_r
   }) %>%
   terra::rast() %>%
-  setNames(
-    paste0(
-      meta_data$class, "-", meta_data$species, "-",
-      gsub("-", "_", meta_data$model, fixed = TRUE)
-    )
-  ) %>%
+  setNames(meta_data$name) %>%
   terra::mask(study_area_data)
 
 # calculate total sum of values within each raster
@@ -172,17 +171,21 @@ meta_data <-
   filter(spp_max_value >= spp_parameters$min_area_threshold)
 
 # subset raster data
-spp_data <- spp_data[[meta_data$id]]
+spp_data <- spp_data[[meta_data$name]]
 
 # update metadata
 meta_data <-
   meta_data %>%
-  mutate(
-    id = seq_along(id),
-    name =  names(spp_data)
-  ) %>%
-  rename(proj = model) %>%
+  mutate(id = seq_along(id)) %>%
   select(id, name, species, class, proj, auc, boyce, threshold)
+
+# sanity check
+assertthat::assert_that(
+  identical(
+    meta_data$name,
+    names(spp_data)
+  )
+)
 
 # save results
 spp_path <- "data/intermediate/species.tif"
