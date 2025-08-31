@@ -7,7 +7,7 @@ R=/opt/R/R-4.4.1/bin/R # path to R 4.4.1 installation
 R:
 	$(R) --quiet --no-save
 
-all: install analysis
+all: install raw_data analysis
 
 clean:
 	@rm -rf data/intermediate/*
@@ -18,10 +18,10 @@ clean:
 	@touch article/.gitkeep
 
 upload:
-	$(R) -e "piggyback::pb_upload('article/cost.tif',repo='jeffreyhanson/robust.prioritizr.data',tag='v1.0.0'),overwrite=TRUE"
-	$(R) -e "piggyback::pb_upload('article/pa.tif',repo='jeffreyhanson/robust.prioritizr.data',tag='v1.0.0'),overwrite=TRUE"
-	$(R) -e "piggyback::pb_upload('article/species.tif',repo='jeffreyhanson/robust.prioritizr.data',tag='v1.0.0'),overwite=TRUE"
-	$(R) -e "piggyback::pb_upload('article/species.csv',repo='jeffreyhanson/robust.prioritizr.data',tag='v1.0.0'),overwite=TRUE"
+	$(R) -e "piggyback::pb_upload('article/cost.tif',repo='jeffreyhanson/robust.prioritizr.data',tag='v1.0.0',overwrite=TRUE)"
+	$(R) -e "piggyback::pb_upload('article/pa.tif',repo='jeffreyhanson/robust.prioritizr.data',tag='v1.0.0',overwrite=TRUE)"
+	$(R) -e "piggyback::pb_upload('article/species.tif',repo='jeffreyhanson/robust.prioritizr.data',tag='v1.0.0',overwrite=TRUE)"
+	$(R) -e "piggyback::pb_upload('article/species.csv',repo='jeffreyhanson/robust.prioritizr.data',tag='v1.0.0',overwrite=TRUE)"
 
 # commands for updating time-stamps
 touch:
@@ -82,4 +82,4 @@ install:
 renv_snapshot:
 	$(R) -e "renv::snapshot()"
 
-.PHONY: install clean all analysis article figures
+.PHONY: install clean all analysis article figures upload
